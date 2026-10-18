@@ -13,9 +13,10 @@ class RankingRepository {
       params: {'p_period': period, 'p_limit': 100},
     );
     return (rows as List<dynamic>)
-        .map((row) => LeaderboardEntry.fromJson(
-              Map<String, dynamic>.from(row as Map),
-            ))
+        .map(
+          (row) =>
+              LeaderboardEntry.fromJson(Map<String, dynamic>.from(row as Map)),
+        )
         .toList(growable: false);
   }
 }

@@ -32,7 +32,9 @@ class WelcomeScreen extends StatelessWidget {
           builder: (context, constraints) => SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(26, 24, 26, 20),
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight - 44),
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - 44,
+              ),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 460),
@@ -48,7 +50,8 @@ class WelcomeScreen extends StatelessWidget {
                       Text(
                         'little notes,\nbig dreams',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        style: Theme.of(context).textTheme.displaySmall
+                            ?.copyWith(
                               height: 1.04,
                               fontWeight: FontWeight.w700,
                               color: AppPalette.ink,
@@ -58,10 +61,8 @@ class WelcomeScreen extends StatelessWidget {
                       Text(
                         'A simple space for your thoughts, ideas and dreams.',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: AppPalette.mutedInk,
-                              height: 1.5,
-                            ),
+                        style: Theme.of(context).textTheme.bodyLarge
+                            ?.copyWith(color: AppPalette.mutedInk, height: 1.5),
                       ),
                       const SizedBox(height: 28),
                       SizedBox(
@@ -74,7 +75,9 @@ class WelcomeScreen extends StatelessWidget {
                       const SizedBox(height: 8),
                       TextButton(
                         onPressed: () => _openAuth(context, signUp: false),
-                        child: const Text('I already have an account  ·  Log in'),
+                        child: const Text(
+                          'I already have an account  ·  Log in',
+                        ),
                       ),
                       if (client == null || initializationError != null) ...[
                         const SizedBox(height: 16),
@@ -87,7 +90,10 @@ class WelcomeScreen extends StatelessWidget {
                           child: const Text(
                             'Connect a Supabase project to create an account and sync notes. Add SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY at build time.',
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: AppPalette.ink, height: 1.4),
+                            style: TextStyle(
+                              color: AppPalette.ink,
+                              height: 1.4,
+                            ),
                           ),
                         ),
                       ],
@@ -110,10 +116,7 @@ class DreamSkyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final sky = Paint()..color = const Color(0xFFF0EAF6);
     canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Offset.zero & size,
-        const Radius.circular(42),
-      ),
+      RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(42)),
       sky,
     );
 
@@ -132,10 +135,18 @@ class DreamSkyPainter extends CustomPainter {
     _drawStar(canvas, Offset(size.width * .51, size.height * .2), 7);
     _drawStar(canvas, Offset(size.width * .84, size.height * .48), 6);
     _drawStar(canvas, Offset(size.width * .18, size.height * .69), 7);
-    _drawFlower(canvas, Offset(size.width * .24, size.height * .76), 16,
-        const Color(0xFFE7AFC1));
-    _drawFlower(canvas, Offset(size.width * .76, size.height * .8), 13,
-        const Color(0xFFEAC17C));
+    _drawFlower(
+      canvas,
+      Offset(size.width * .24, size.height * .76),
+      16,
+      const Color(0xFFE7AFC1),
+    );
+    _drawFlower(
+      canvas,
+      Offset(size.width * .76, size.height * .8),
+      13,
+      const Color(0xFFEAC17C),
+    );
 
     final hill = Paint()..color = const Color(0xFFDDECE3);
     canvas.drawOval(
@@ -149,12 +160,24 @@ class DreamSkyPainter extends CustomPainter {
   }
 
   void _drawCloud(Canvas canvas, Offset center, double scale, Paint paint) {
-    canvas.drawCircle(center.translate(-18 * scale, 4 * scale), 16 * scale, paint);
+    canvas.drawCircle(
+      center.translate(-18 * scale, 4 * scale),
+      16 * scale,
+      paint,
+    );
     canvas.drawCircle(center.translate(0, -5 * scale), 21 * scale, paint);
-    canvas.drawCircle(center.translate(21 * scale, 4 * scale), 15 * scale, paint);
+    canvas.drawCircle(
+      center.translate(21 * scale, 4 * scale),
+      15 * scale,
+      paint,
+    );
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromCenter(center: center.translate(2 * scale, 10 * scale), width: 58 * scale, height: 20 * scale),
+        Rect.fromCenter(
+          center: center.translate(2 * scale, 10 * scale),
+          width: 58 * scale,
+          height: 20 * scale,
+        ),
         Radius.circular(10 * scale),
       ),
       paint,
@@ -186,12 +209,19 @@ class DreamSkyPainter extends CustomPainter {
     for (var i = 0; i < 5; i++) {
       final angle = i * 2 * math.pi / 5;
       canvas.drawCircle(
-        center.translate(math.cos(angle) * radius * .7, math.sin(angle) * radius * .7),
+        center.translate(
+          math.cos(angle) * radius * .7,
+          math.sin(angle) * radius * .7,
+        ),
         radius * .44,
         petal,
       );
     }
-    canvas.drawCircle(center, radius * .3, Paint()..color = const Color(0xFFF5E7B5));
+    canvas.drawCircle(
+      center,
+      radius * .3,
+      Paint()..color = const Color(0xFFF5E7B5),
+    );
   }
 
   @override

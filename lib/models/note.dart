@@ -19,7 +19,8 @@ class Note {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  String get displayTitle => title.trim().isEmpty ? 'Untitled note' : title.trim();
+  String get displayTitle =>
+      title.trim().isEmpty ? 'Untitled note' : title.trim();
 
   String get preview {
     final plain = content
@@ -30,13 +31,13 @@ class Note {
   }
 
   factory Note.fromJson(Map<String, dynamic> json) => Note(
-        id: json['id'] as String,
-        title: json['title'] as String? ?? '',
-        content: json['content'] as String? ?? '',
-        color: json['color'] as String? ?? '#F3EAF7',
-        tags: (json['tags'] as List<dynamic>? ?? const []).cast<String>(),
-        folderId: json['folder_id'] as String?,
-        createdAt: DateTime.parse(json['created_at'] as String).toUtc(),
-        updatedAt: DateTime.parse(json['updated_at'] as String).toUtc(),
-      );
+    id: json['id'] as String,
+    title: json['title'] as String? ?? '',
+    content: json['content'] as String? ?? '',
+    color: json['color'] as String? ?? '#F3EAF7',
+    tags: (json['tags'] as List<dynamic>? ?? const []).cast<String>(),
+    folderId: json['folder_id'] as String?,
+    createdAt: DateTime.parse(json['created_at'] as String).toUtc(),
+    updatedAt: DateTime.parse(json['updated_at'] as String).toUtc(),
+  );
 }

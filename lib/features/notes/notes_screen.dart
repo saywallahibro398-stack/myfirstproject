@@ -125,7 +125,10 @@ class _NotesScreenState extends State<NotesScreen> {
 
   void _searchChanged(String _) {
     _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 280), () => _load(reset: true));
+    _debounce = Timer(
+      const Duration(milliseconds: 280),
+      () => _load(reset: true),
+    );
   }
 
   Future<void> _delete(Note note) async {
@@ -133,10 +136,18 @@ class _NotesScreenState extends State<NotesScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete note?'),
-        content: Text('“${note.displayTitle}” will be removed from your account.'),
+        content: Text(
+          '“${note.displayTitle}” will be removed from your account.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
         ],
       ),
     );
@@ -156,21 +167,37 @@ class _NotesScreenState extends State<NotesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final folderName = _folders.where((folder) => folder.id == _selectedFolder).firstOrNull?.name;
+    final folderName = _folders
+        .where((folder) => folder.id == _selectedFolder)
+        .firstOrNull
+        ?.name;
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
           controller: _scrollController,
           slivers: [
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.page, 16, AppSpacing.page, 12),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.page,
+                16,
+                AppSpacing.page,
+                12,
+              ),
               sliver: SliverToBoxAdapter(
                 child: Row(
                   children: [
                     Expanded(child: SectionHeading(folderName ?? 'All notes')),
-                    IconButton(tooltip: 'Manage folders', onPressed: widget.onOpenFolders, icon: const Icon(Icons.folder_open_outlined)),
+                    IconButton(
+                      tooltip: 'Manage folders',
+                      onPressed: widget.onOpenFolders,
+                      icon: const Icon(Icons.folder_open_outlined),
+                    ),
                     if (folderName != null)
-                      IconButton(tooltip: 'Show all notes', onPressed: widget.onClearFolder, icon: const Icon(Icons.close)),
+                      IconButton(
+                        tooltip: 'Show all notes',
+                        onPressed: widget.onClearFolder,
+                        icon: const Icon(Icons.close),
+                      ),
                   ],
                 ),
               ),
@@ -199,7 +226,12 @@ class _NotesScreenState extends State<NotesScreen> {
               ),
             ),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.page, 14, AppSpacing.page, 6),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.page,
+                14,
+                AppSpacing.page,
+                6,
+              ),
               sliver: SliverToBoxAdapter(child: _filters()),
             ),
             SliverPadding(
@@ -211,26 +243,43 @@ class _NotesScreenState extends State<NotesScreen> {
                     value: _sort,
                     underline: const SizedBox.shrink(),
                     items: const [
-                      DropdownMenuItem(value: 'updated_at', child: Text('Recently updated')),
-                      DropdownMenuItem(value: 'created_at', child: Text('Date created')),
-                      DropdownMenuItem(value: 'title', child: Text('Title A–Z')),
+                      DropdownMenuItem(
+                        value: 'updated_at',
+                        child: Text('Recently updated'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'created_at',
+                        child: Text('Date created'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'title',
+                        child: Text('Title A–Z'),
+                      ),
                     ],
                     onChanged: (value) {
-                      if (value != null) setState(() { _sort = value; _load(reset: true); });
+                      if (value != null) {
+                        setState(() {
+                          _sort = value;
+                          _load(reset: true);
+                        });
+                      }
                     },
                   ),
                 ),
               ),
             ),
             if (_loading)
-              const SliverFillRemaining(child: Center(child: CircularProgressIndicator()))
+              const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator()),
+              )
             else if (_error != null)
               SliverFillRemaining(
                 hasScrollBody: false,
                 child: EmptyState(
                   icon: Icons.cloud_off_outlined,
                   title: 'Notes are unavailable',
-                  message: 'Check your connection, then try loading them again.',
+                  message:
+                      'Check your connection, then try loading them again.',
                   actionLabel: 'Retry',
                   onAction: () => _load(reset: true),
                 ),
@@ -240,17 +289,26 @@ class _NotesScreenState extends State<NotesScreen> {
                 hasScrollBody: false,
                 child: EmptyState(
                   icon: Icons.sticky_note_2_outlined,
-                  title: _searchController.text.isEmpty ? 'No notes here yet' : 'No notes found',
+                  title: _searchController.text.isEmpty
+                      ? 'No notes here yet'
+                      : 'No notes found',
                   message: _searchController.text.isEmpty
                       ? 'Start with one small thought. You can sort it into a folder later.'
                       : 'Try a different title or phrase.',
-                  actionLabel: _searchController.text.isEmpty ? 'Write a note' : null,
+                  actionLabel: _searchController.text.isEmpty
+                      ? 'Write a note'
+                      : null,
                   onAction: widget.onCreateNote,
                 ),
               )
             else
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.page, 4, AppSpacing.page, 22),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.page,
+                  4,
+                  AppSpacing.page,
+                  22,
+                ),
                 sliver: SliverList.separated(
                   itemCount: _notes.length + (_loadingMore ? 1 : 0),
                   separatorBuilder: (context, _) => const SizedBox(height: 9),
@@ -262,7 +320,9 @@ class _NotesScreenState extends State<NotesScreen> {
                       );
                     }
                     final note = _notes[index];
-                    final folder = _folders.where((value) => value.id == note.folderId).firstOrNull;
+                    final folder = _folders
+                        .where((value) => value.id == note.folderId)
+                        .firstOrNull;
                     return NoteCard(
                       note: note,
                       folderName: folder?.name,
@@ -285,7 +345,11 @@ class _NotesScreenState extends State<NotesScreen> {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _FilterChip(label: 'All', selected: _selectedFolder == null, onTap: () => _setFolder(null)),
+          _FilterChip(
+            label: 'All',
+            selected: _selectedFolder == null,
+            onTap: () => _setFolder(null),
+          ),
           for (final folder in folders)
             _FilterChip(
               label: folder.name,
@@ -305,7 +369,12 @@ class _NotesScreenState extends State<NotesScreen> {
 }
 
 class _FilterChip extends StatelessWidget {
-  const _FilterChip({required this.label, required this.selected, required this.onTap, this.color});
+  const _FilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.color,
+  });
 
   final String label;
   final bool selected;
@@ -314,14 +383,14 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(right: 8),
-        child: FilterChip(
-          label: Text(label),
-          selected: selected,
-          onSelected: (_) => onTap(),
-          backgroundColor: color ?? AppPalette.white,
-          selectedColor: AppPalette.lavender,
-          side: BorderSide.none,
-        ),
-      );
+    padding: const EdgeInsets.only(right: 8),
+    child: FilterChip(
+      label: Text(label),
+      selected: selected,
+      onSelected: (_) => onTap(),
+      backgroundColor: color ?? AppPalette.white,
+      selectedColor: AppPalette.lavender,
+      side: BorderSide.none,
+    ),
+  );
 }

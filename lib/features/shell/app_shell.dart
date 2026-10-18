@@ -74,9 +74,7 @@ class _AppShellState extends State<AppShell> {
 
   void _openStreaks() {
     Navigator.of(context).push<void>(
-      MaterialPageRoute(
-        builder: (_) => StreaksScreen(client: widget.client),
-      ),
+      MaterialPageRoute(builder: (_) => StreaksScreen(client: widget.client)),
     );
   }
 
@@ -93,8 +91,10 @@ class _AppShellState extends State<AppShell> {
       HomeScreen(
         key: ValueKey('home-$_refreshVersion'),
         client: widget.client,
+        onThemeChanged: widget.onThemeChanged,
         onCreateNote: () => _openEditor(),
-        onCreateTemplate: (title, content) => _openEditor(title: title, content: content),
+        onCreateTemplate: (title, content) =>
+            _openEditor(title: title, content: content),
         onOpenNotes: () => _openNotes(),
         onOpenFolders: _openFolders,
         onOpenStreaks: _openStreaks,
@@ -116,7 +116,10 @@ class _AppShellState extends State<AppShell> {
         onCreateNote: () => _openEditor(folderId: _folderId),
         onChanged: _refreshData,
       ),
-      RankingScreen(key: ValueKey('ranking-$_refreshVersion'), client: widget.client),
+      RankingScreen(
+        key: ValueKey('ranking-$_refreshVersion'),
+        client: widget.client,
+      ),
       SettingsScreen(
         key: ValueKey('settings-$_refreshVersion'),
         client: widget.client,
@@ -129,13 +132,34 @@ class _AppShellState extends State<AppShell> {
       body: IndexedStack(index: _selectedIndex, children: pages),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) => setState(() => _selectedIndex = index),
+        onDestinationSelected: (index) =>
+            setState(() => _selectedIndex = index),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home_rounded), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.calendar_month_outlined), selectedIcon: Icon(Icons.calendar_month), label: 'Calendar'),
-          NavigationDestination(icon: Icon(Icons.sticky_note_2_outlined), selectedIcon: Icon(Icons.sticky_note_2), label: 'Notes'),
-          NavigationDestination(icon: Icon(Icons.emoji_events_outlined), selectedIcon: Icon(Icons.emoji_events), label: 'Ranking'),
-          NavigationDestination(icon: Icon(Icons.settings_outlined), selectedIcon: Icon(Icons.settings), label: 'Settings'),
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home_rounded),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.calendar_month_outlined),
+            selectedIcon: Icon(Icons.calendar_month),
+            label: 'Calendar',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.sticky_note_2_outlined),
+            selectedIcon: Icon(Icons.sticky_note_2),
+            label: 'Notes',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.emoji_events_outlined),
+            selectedIcon: Icon(Icons.emoji_events),
+            label: 'Ranking',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
         ],
       ),
       floatingActionButton: _selectedIndex == 2

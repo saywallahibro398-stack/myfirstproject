@@ -40,7 +40,9 @@ class _AuthScreenState extends State<AuthScreen> {
     if (!_formKey.currentState!.validate()) return;
     final client = widget.client;
     if (client == null) {
-      _message('Add the Supabase URL and publishable key to connect your account.');
+      _message(
+        'Add the Supabase URL and publishable key to connect your account.',
+      );
       return;
     }
 
@@ -51,9 +53,12 @@ class _AuthScreenState extends State<AuthScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text,
           data: {'display_name': _nameController.text.trim()},
+          emailRedirectTo: AppConfig.fromBuildEnvironment.authRedirectUrl,
         );
         if (response.session == null && mounted) {
-          _message('Check your inbox to confirm your email, then come back to log in.');
+          _message(
+            'Check your inbox to confirm your email, then come back to log in.',
+          );
         }
       } else {
         await client.auth.signInWithPassword(
@@ -64,7 +69,9 @@ class _AuthScreenState extends State<AuthScreen> {
     } on AuthException catch (error) {
       _message(error.message);
     } catch (_) {
-      _message('We could not connect right now. Check your connection and try again.');
+      _message(
+        'We could not connect right now. Check your connection and try again.',
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -85,14 +92,18 @@ class _AuthScreenState extends State<AuthScreen> {
     } on AuthException catch (error) {
       _message(error.message);
     } catch (_) {
-      _message('Google sign-in is unavailable. Check the Supabase OAuth setup.');
+      _message(
+        'Google sign-in is unavailable. Check the Supabase OAuth setup.',
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
   Future<void> _forgotPassword() async {
-    final controller = TextEditingController(text: _emailController.text.trim());
+    final controller = TextEditingController(
+      text: _emailController.text.trim(),
+    );
     final email = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -108,7 +119,8 @@ class _AuthScreenState extends State<AuthScreen> {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, controller.text.trim()),
+            onPressed: () =>
+                Navigator.pop(dialogContext, controller.text.trim()),
             child: const Text('Send link'),
           ),
         ],
@@ -152,14 +164,17 @@ class _AuthScreenState extends State<AuthScreen> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
               children: [
-                const Icon(Icons.edit_note_rounded, size: 42, color: AppPalette.lavenderDeep),
+                const Icon(
+                  Icons.edit_note_rounded,
+                  size: 42,
+                  color: AppPalette.lavenderDeep,
+                ),
                 const SizedBox(height: 18),
                 Text(
                   title,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                  style: Theme.of(context).textTheme.headlineMedium
+                      ?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -167,7 +182,10 @@ class _AuthScreenState extends State<AuthScreen> {
                       ? 'Your own little corner for ideas, plans and everyday moments.'
                       : 'Your notes are waiting right where you left them.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppPalette.mutedInk, height: 1.45),
+                  style: const TextStyle(
+                    color: AppPalette.mutedInk,
+                    height: 1.45,
+                  ),
                 ),
                 const SizedBox(height: 26),
                 PastelCard(
@@ -184,7 +202,8 @@ class _AuthScreenState extends State<AuthScreen> {
                               labelText: 'Your name',
                               prefixIcon: Icon(Icons.person_outline),
                             ),
-                            validator: (value) => value == null || value.trim().isEmpty
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty
                                 ? 'Add your name to get started.'
                                 : null,
                           ),
@@ -200,7 +219,8 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                           validator: (value) {
                             final email = value?.trim() ?? '';
-                            return RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email)
+                            return RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
+                                    .hasMatch(email)
                                 ? null
                                 : 'Enter a valid email address.';
                           },
@@ -216,15 +236,23 @@ class _AuthScreenState extends State<AuthScreen> {
                             labelText: 'Password',
                             prefixIcon: const Icon(Icons.lock_outline),
                             suffixIcon: IconButton(
-                              tooltip: _obscurePassword ? 'Show password' : 'Hide password',
-                              onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                              icon: Icon(_obscurePassword
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined),
+                              tooltip: _obscurePassword
+                                  ? 'Show password'
+                                  : 'Hide password',
+                              onPressed: () => setState(
+                                () => _obscurePassword = !_obscurePassword,
+                              ),
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                              ),
                             ),
                           ),
                           validator: (value) {
-                            if (value == null || value.isEmpty) return 'Enter your password.';
+                            if (value == null || value.isEmpty) {
+                              return 'Enter your password.';
+                            }
                             if (_isSignUp && value.length < 8) {
                               return 'Use at least 8 characters.';
                             }
@@ -248,7 +276,10 @@ class _AuthScreenState extends State<AuthScreen> {
                             child: _loading
                                 ? const SizedBox.square(
                                     dimension: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
                                   )
                                 : Text(_isSignUp ? 'Create account' : 'Log in'),
                           ),
@@ -258,8 +289,13 @@ class _AuthScreenState extends State<AuthScreen> {
                           children: [
                             const Expanded(child: Divider()),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              child: Text('OR', style: Theme.of(context).textTheme.labelSmall),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              child: Text(
+                                'OR',
+                                style: Theme.of(context).textTheme.labelSmall,
+                              ),
                             ),
                             const Expanded(child: Divider()),
                           ],
@@ -279,10 +315,14 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
                 const SizedBox(height: 18),
                 TextButton(
-                  onPressed: _loading ? null : () => setState(() => _isSignUp = !_isSignUp),
-                  child: Text(_isSignUp
-                      ? 'Already have an account? Log in'
-                      : 'New here? Create an account'),
+                  onPressed: _loading
+                      ? null
+                      : () => setState(() => _isSignUp = !_isSignUp),
+                  child: Text(
+                    _isSignUp
+                        ? 'Already have an account? Log in'
+                        : 'New here? Create an account',
+                  ),
                 ),
                 if (widget.client == null)
                   const Padding(

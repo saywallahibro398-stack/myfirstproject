@@ -24,22 +24,24 @@ class NotesRepository {
       query = query.or('title.ilike.%$safeTerm%,content.ilike.%$safeTerm%');
     }
     final rows = await query
-      .order(orderBy, ascending: orderBy == 'title')
+        .order(orderBy, ascending: orderBy == 'title')
         .range(offset, offset + limit - 1);
     return rows.map((row) => Note.fromJson(row)).toList(growable: false);
   }
 
   Future<List<Note>> fetchAllNotes({String? folderId}) async {
-    final rows = await client
-        .from('notes')
-        .select()
-        .eq('user_id', _userId)
-        .order('updated_at', ascending: false)
-        .limit(1000);
-    final notes = rows.map((row) => Note.fromJson(row)).toList();
-    return folderId == null
-        ? notes
-        : notes.where((note) => note.folderId == folderId).toList();
+    const pageSize = 200;
+    final notes = <Note>[];
+    for (var offset = 0; ; offset += pageSize) {
+      var query = client.from('notes').select().eq('user_id', _userId);
+      if (folderId != null) query = query.eq('folder_id', folderId);
+      final rows = await query
+          .order('updated_at', ascending: false)
+          .range(offset, offset + pageSize - 1);
+      notes.addAll(rows.map(Note.fromJson));
+      if (rows.length < pageSize) break;
+    }
+    return notes;
   }
 
   Future<Note> saveNote({

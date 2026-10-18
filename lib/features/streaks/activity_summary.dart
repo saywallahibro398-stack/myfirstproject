@@ -11,13 +11,21 @@ class ActivitySummary {
     final current = now?.toUtc() ?? DateTime.now().toUtc();
     final today = DateTime.utc(current.year, current.month, current.day);
     final normalized = dates
-        .map((date) => DateTime.utc(date.toUtc().year, date.toUtc().month, date.toUtc().day))
+        .map(
+          (date) => DateTime.utc(
+            date.toUtc().year,
+            date.toUtc().month,
+            date.toUtc().day,
+          ),
+        )
         .toSet();
     return ActivitySummary._(normalized, today);
   }
 
   int get currentStreak {
-    var cursor = days.contains(today) ? today : today.subtract(const Duration(days: 1));
+    var cursor = days.contains(today)
+        ? today
+        : today.subtract(const Duration(days: 1));
     if (!days.contains(cursor)) return 0;
 
     var streak = 0;

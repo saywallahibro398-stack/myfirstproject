@@ -11,7 +11,11 @@ import '../../widgets/pastel_card.dart';
 import '../../widgets/section_heading.dart';
 
 class CalendarScreen extends StatefulWidget {
-  const CalendarScreen({required this.client, required this.onOpenNote, super.key});
+  const CalendarScreen({
+    required this.client,
+    required this.onOpenNote,
+    super.key,
+  });
 
   final SupabaseClient client;
   final ValueChanged<Note> onOpenNote;
@@ -40,7 +44,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     await future;
   }
 
-  DateTime _dayKey(DateTime date) => DateTime.utc(date.year, date.month, date.day);
+  DateTime _dayKey(DateTime date) =>
+      DateTime.utc(date.year, date.month, date.day);
 
   @override
   Widget build(BuildContext context) {
@@ -55,10 +60,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 title: 'Calendar is unavailable',
                 message: 'Your notes could not be loaded from Supabase.',
                 actionLabel: 'Retry',
-                onAction: () => setState(() => _notes = NotesRepository(widget.client).fetchAllNotes()),
+                onAction: () => setState(
+                  () => _notes = NotesRepository(widget.client).fetchAllNotes(),
+                ),
               );
             }
-            if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
             final notes = snapshot.data!;
             final activeDays = <DateTime>{};
             for (final note in notes) {
@@ -74,11 +83,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
               onRefresh: _refresh,
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(AppSpacing.page, 18, AppSpacing.page, 28),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.page,
+                  18,
+                  AppSpacing.page,
+                  28,
+                ),
                 children: [
-                  Text('Your calendar', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700)),
+                  Text(
+                    'Your calendar',
+                    style: Theme.of(context).textTheme.headlineMedium
+                        ?.copyWith(fontWeight: FontWeight.w700),
+                  ),
                   const SizedBox(height: 6),
-                  const Text('Little moments, gathered day by day.', style: TextStyle(color: AppPalette.mutedInk)),
+                  const Text(
+                    'Little moments, gathered day by day.',
+                    style: TextStyle(color: AppPalette.mutedInk),
+                  ),
                   const SizedBox(height: 20),
                   PastelCard(
                     color: AppPalette.lavender,
@@ -88,19 +109,30 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           children: [
                             IconButton(
                               tooltip: 'Previous month',
-                              onPressed: () => setState(() => _month = DateTime.utc(_month.year, _month.month - 1)),
+                              onPressed: () => setState(
+                                () => _month = DateTime.utc(
+                                  _month.year,
+                                  _month.month - 1,
+                                ),
+                              ),
                               icon: const Icon(Icons.chevron_left),
                             ),
                             Expanded(
                               child: Text(
                                 DateFormat.yMMMM().format(_month),
                                 textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                                style: Theme.of(context).textTheme.titleLarge
+                                    ?.copyWith(fontWeight: FontWeight.w700),
                               ),
                             ),
                             IconButton(
                               tooltip: 'Next month',
-                              onPressed: () => setState(() => _month = DateTime.utc(_month.year, _month.month + 1)),
+                              onPressed: () => setState(
+                                () => _month = DateTime.utc(
+                                  _month.year,
+                                  _month.month + 1,
+                                ),
+                              ),
                               icon: const Icon(Icons.chevron_right),
                             ),
                           ],
@@ -108,11 +140,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         const SizedBox(height: 8),
                         Row(
                           children: const ['M', 'T', 'W', 'T', 'F', 'S', 'S']
-                              .map((day) => Expanded(
-                                    child: Center(
-                                      child: Text(day, style: const TextStyle(color: AppPalette.mutedInk, fontSize: 12)),
+                              .map(
+                                (day) => Expanded(
+                                  child: Center(
+                                    child: Text(
+                                      day,
+                                      style: const TextStyle(
+                                        color: AppPalette.mutedInk,
+                                        fontSize: 12,
+                                      ),
                                     ),
-                                  ))
+                                  ),
+                                ),
+                              )
                               .toList(),
                         ),
                         const SizedBox(height: 8),
@@ -121,16 +161,28 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.circle, size: 7, color: AppPalette.lavenderDeep),
+                            Icon(
+                              Icons.circle,
+                              size: 7,
+                              color: AppPalette.lavenderDeep,
+                            ),
                             SizedBox(width: 6),
-                            Text('A note was written or updated', style: TextStyle(fontSize: 12, color: AppPalette.mutedInk)),
+                            Text(
+                              'A note was written or updated',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppPalette.mutedInk,
+                              ),
+                            ),
                           ],
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
-                  SectionHeading(DateFormat('EEEE, MMMM d').format(_selectedDay)),
+                  SectionHeading(
+                    DateFormat('EEEE, MMMM d').format(_selectedDay),
+                  ),
                   const SizedBox(height: 10),
                   if (selectedNotes.isEmpty)
                     const Padding(
@@ -138,12 +190,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       child: EmptyState(
                         icon: Icons.event_note_outlined,
                         title: 'A quiet day',
-                        message: 'No notes were created or updated on this date.',
+                        message:
+                            'No notes were created or updated on this date.',
                       ),
                     )
                   else
                     for (final note in selectedNotes) ...[
-                      NoteCard(note: note, onTap: () => widget.onOpenNote(note), onEdit: () => widget.onOpenNote(note)),
+                      NoteCard(
+                        note: note,
+                        onTap: () => widget.onOpenNote(note),
+                        onEdit: () => widget.onOpenNote(note),
+                      ),
                       const SizedBox(height: 9),
                     ],
                 ],
@@ -171,7 +228,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
       itemBuilder: (context, index) {
         final dayNumber = index - startOffset + 1;
-        if (dayNumber < 1 || dayNumber > daysInMonth) return const SizedBox.shrink();
+        if (dayNumber < 1 || dayNumber > daysInMonth) {
+          return const SizedBox.shrink();
+        }
         final date = DateTime.utc(_month.year, _month.month, dayNumber);
         final selected = date == _selectedDay;
         final hasNote = activeDays.contains(date);
@@ -183,12 +242,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
             children: [
               CircleAvatar(
                 radius: 15,
-                backgroundColor: selected ? AppPalette.lavenderDeep : Colors.transparent,
+                backgroundColor: selected
+                    ? AppPalette.lavenderDeep
+                    : Colors.transparent,
                 foregroundColor: selected ? Colors.white : AppPalette.ink,
                 child: Text('$dayNumber', style: const TextStyle(fontSize: 12)),
               ),
               const SizedBox(height: 2),
-              Icon(Icons.circle, size: 5, color: hasNote ? AppPalette.lavenderDeep : Colors.transparent),
+              Icon(
+                Icons.circle,
+                size: 5,
+                color: hasNote ? AppPalette.lavenderDeep : Colors.transparent,
+              ),
             ],
           ),
         );

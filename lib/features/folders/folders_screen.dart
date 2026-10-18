@@ -84,7 +84,9 @@ class _FoldersScreenState extends State<FoldersScreen> {
                       child: CircleAvatar(
                         radius: 16,
                         backgroundColor: value,
-                        child: color == hex ? const Icon(Icons.check, size: 16) : null,
+                        child: color == hex
+                            ? const Icon(Icons.check, size: 16)
+                            : null,
                       ),
                     );
                   }).toList(),
@@ -96,22 +98,33 @@ class _FoldersScreenState extends State<FoldersScreen> {
                   items: const [
                     DropdownMenuItem(value: 'folder', child: Text('Folder')),
                     DropdownMenuItem(value: 'school', child: Text('Study')),
-                    DropdownMenuItem(value: 'favorite', child: Text('Personal')),
+                    DropdownMenuItem(
+                      value: 'favorite',
+                      child: Text('Personal'),
+                    ),
                     DropdownMenuItem(value: 'work', child: Text('Work')),
                     DropdownMenuItem(value: 'lightbulb', child: Text('Ideas')),
                     DropdownMenuItem(value: 'more_horiz', child: Text('Other')),
                   ],
-                  onChanged: (value) => setDialogState(() => icon = value ?? 'folder'),
+                  onChanged: (value) =>
+                      setDialogState(() => icon = value ?? 'folder'),
                 ),
               ],
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
             FilledButton(
               onPressed: () {
                 if (nameController.text.trim().isEmpty) return;
-                Navigator.pop(context, (nameController.text.trim(), color, icon));
+                Navigator.pop(context, (
+                  nameController.text.trim(),
+                  color,
+                  icon,
+                ));
               },
               child: const Text('Save folder'),
             ),
@@ -131,7 +144,13 @@ class _FoldersScreenState extends State<FoldersScreen> {
       await _refresh();
       widget.onChanged();
     } on PostgrestException catch (error) {
-      if (mounted) _message(error.code == '23505' ? 'A folder with that name already exists.' : error.message);
+      if (mounted) {
+        _message(
+          error.code == '23505'
+              ? 'A folder with that name already exists.'
+              : error.message,
+        );
+      }
     } catch (_) {
       if (mounted) _message('The folder could not be saved.');
     }
@@ -144,8 +163,14 @@ class _FoldersScreenState extends State<FoldersScreen> {
         title: Text('Delete ${folder.name}?'),
         content: const Text('Your notes will be kept and moved to No folder.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete folder')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete folder'),
+          ),
         ],
       ),
     );
@@ -164,13 +189,13 @@ class _FoldersScreenState extends State<FoldersScreen> {
   }
 
   IconData _icon(String value) => switch (value) {
-        'school' => Icons.school_outlined,
-        'favorite' => Icons.favorite_border_rounded,
-        'work' => Icons.work_outline_rounded,
-        'lightbulb' => Icons.lightbulb_outline_rounded,
-        'more_horiz' => Icons.more_horiz_rounded,
-        _ => Icons.folder_outlined,
-      };
+    'school' => Icons.school_outlined,
+    'favorite' => Icons.favorite_border_rounded,
+    'work' => Icons.work_outline_rounded,
+    'lightbulb' => Icons.lightbulb_outline_rounded,
+    'more_horiz' => Icons.more_horiz_rounded,
+    _ => Icons.folder_outlined,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +203,11 @@ class _FoldersScreenState extends State<FoldersScreen> {
       appBar: AppBar(
         title: const Text('Your folders'),
         actions: [
-          IconButton(tooltip: 'Create folder', onPressed: () => _editFolder(), icon: const Icon(Icons.create_new_folder_outlined)),
+          IconButton(
+            tooltip: 'Create folder',
+            onPressed: () => _editFolder(),
+            icon: const Icon(Icons.create_new_folder_outlined),
+          ),
         ],
       ),
       body: FutureBuilder<_FolderData>(
@@ -193,13 +222,16 @@ class _FoldersScreenState extends State<FoldersScreen> {
               onAction: () => setState(() => _data = _load()),
             );
           }
-          if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
           final data = snapshot.data!;
           if (data.folders.isEmpty) {
             return EmptyState(
               icon: Icons.folder_open_outlined,
               title: 'Start with a folder',
-              message: 'Create a place for the thoughts you want to keep together.',
+              message:
+                  'Create a place for the thoughts you want to keep together.',
               actionLabel: 'Create folder',
               onAction: () => _editFolder(),
             );
@@ -207,13 +239,19 @@ class _FoldersScreenState extends State<FoldersScreen> {
           return RefreshIndicator(
             onRefresh: _refresh,
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.page, 8, AppSpacing.page, 30),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.page,
+                8,
+                AppSpacing.page,
+                30,
+              ),
               children: [
                 const SectionHeading('A place for every thought'),
                 const SizedBox(height: 16),
                 for (var index = 0; index < data.folders.length; index++) ...[
                   _folderCard(data, data.folders[index]),
-                  if (index < data.folders.length - 1) const SizedBox(height: 12),
+                  if (index < data.folders.length - 1)
+                    const SizedBox(height: 12),
                 ],
               ],
             ),
@@ -238,8 +276,15 @@ class _FoldersScreenState extends State<FoldersScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(folder.name, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                  Text('$count ${count == 1 ? 'note' : 'notes'}', style: const TextStyle(color: AppPalette.mutedInk)),
+                  Text(
+                    folder.name,
+                    style: Theme.of(context).textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    '$count ${count == 1 ? 'note' : 'notes'}',
+                    style: const TextStyle(color: AppPalette.mutedInk),
+                  ),
                 ],
               ),
             ),

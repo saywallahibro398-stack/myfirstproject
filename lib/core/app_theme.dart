@@ -47,13 +47,13 @@ ThemeData buildAppTheme({required bool dark}) {
     brightness: dark ? Brightness.dark : Brightness.light,
     surface: dark ? const Color(0xFF24212A) : AppPalette.white,
   );
-  final textTheme = ThemeData(brightness: dark ? Brightness.dark : Brightness.light)
-      .textTheme
-      .apply(
-        bodyColor: dark ? const Color(0xFFF5F0F7) : AppPalette.ink,
-        displayColor: dark ? const Color(0xFFF5F0F7) : AppPalette.ink,
-        fontFamily: 'serif',
-      );
+  final textTheme =
+      ThemeData(brightness: dark ? Brightness.dark : Brightness.light).textTheme
+          .apply(
+            bodyColor: dark ? const Color(0xFFF5F0F7) : AppPalette.ink,
+            displayColor: dark ? const Color(0xFFF5F0F7) : AppPalette.ink,
+            fontFamily: 'serif',
+          );
 
   return ThemeData(
     useMaterial3: true,
@@ -80,7 +80,10 @@ ThemeData buildAppTheme({required bool dark}) {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(17),
-        borderSide: const BorderSide(color: AppPalette.lavenderDeep, width: 1.5),
+        borderSide: const BorderSide(
+          color: AppPalette.lavenderDeep,
+          width: 1.5,
+        ),
       ),
       labelStyle: const TextStyle(color: AppPalette.mutedInk),
     ),

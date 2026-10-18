@@ -16,6 +16,7 @@ import '../../widgets/section_heading.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
     required this.client,
+    required this.onThemeChanged,
     required this.onCreateNote,
     required this.onCreateTemplate,
     required this.onOpenNotes,
@@ -27,6 +28,7 @@ class HomeScreen extends StatefulWidget {
   });
 
   final SupabaseClient client;
+  final ValueChanged<bool> onThemeChanged;
   final VoidCallback onCreateNote;
   final void Function(String title, String content) onCreateTemplate;
   final VoidCallback onOpenNotes;
@@ -49,6 +51,7 @@ class _HomeData {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<_HomeData> _data;
+  bool _appearanceApplied = false;
 
   @override
   void initState() {
@@ -65,8 +68,13 @@ class _HomeScreenState extends State<HomeScreen> {
       notes.fetchFolders(),
       notes.fetchActivityDates(),
     ]);
+    final profile = result[0] as UserProfile;
+    if (!_appearanceApplied) {
+      _appearanceApplied = true;
+      widget.onThemeChanged(profile.preferences['darkMode'] == true);
+    }
     return _HomeData(
-      result[0] as UserProfile,
+      profile,
       result[1] as List<Note>,
       result[2] as List<NoteFolder>,
       ActivitySummary.fromUtcDates(result[3] as Set<DateTime>),
@@ -84,10 +92,18 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete note?'),
-        content: Text('“${note.displayTitle}” will be removed from your account.'),
+        content: Text(
+          '“${note.displayTitle}” will be removed from your account.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
         ],
       ),
     );
@@ -102,9 +118,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _showTemplates() async {
     const templates = <(String, String, String)>[
-      ('Daily reflection', 'A little check-in', 'Today I feel...\n\nOne good thing that happened...\n\nTomorrow I want to...'),
-      ('Meeting notes', 'Meeting notes', 'Date: \nAttendees: \n\nTopics\n- \n\nDecisions\n- \n\nNext steps\n- '),
-      ('Study outline', 'Study notes', 'Topic: \n\nKey ideas\n- \n\nQuestions to revisit\n- \n\nSummary\n'),
+      (
+        'Daily reflection',
+        'A little check-in',
+        'Today I feel...\n\nOne good thing that happened...\n\nTomorrow I want to...',
+      ),
+      (
+        'Meeting notes',
+        'Meeting notes',
+        'Date: \nAttendees: \n\nTopics\n- \n\nDecisions\n- \n\nNext steps\n- ',
+      ),
+      (
+        'Study outline',
+        'Study notes',
+        'Topic: \n\nKey ideas\n- \n\nQuestions to revisit\n- \n\nSummary\n',
+      ),
     ];
     final selected = await showModalBottomSheet<(String, String, String)>(
       context: context,
@@ -114,11 +142,17 @@ class _HomeScreenState extends State<HomeScreen> {
           shrinkWrap: true,
           padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
           children: [
-            Text('Start with a template', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Start with a template',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 12),
             for (final template in templates)
               ListTile(
-                leading: const Icon(Icons.notes_rounded, color: AppPalette.lavenderDeep),
+                leading: const Icon(
+                  Icons.notes_rounded,
+                  color: AppPalette.lavenderDeep,
+                ),
                 title: Text(template.$1),
                 subtitle: Text(template.$2),
                 onTap: () => Navigator.pop(context, template),
@@ -144,7 +178,10 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('A gentle reminder', style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  'A gentle reminder',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 10),
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
@@ -156,7 +193,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Preferred reminder time'),
-                  subtitle: Text(TimeOfDay(hour: hour, minute: 0).format(context)),
+                  subtitle: Text(
+                    TimeOfDay(hour: hour, minute: 0).format(context),
+                  ),
                   trailing: const Icon(Icons.schedule_outlined),
                   onTap: enabled
                       ? () async {
@@ -164,10 +203,17 @@ class _HomeScreenState extends State<HomeScreen> {
                             context: context,
                             initialTime: TimeOfDay(hour: hour, minute: 0),
                           );
-                          if (time != null) setSheetState(() => hour = time.hour);
+                          if (time != null) {
+                            setSheetState(() => hour = time.hour);
+                          }
                         }
                       : null,
                 ),
+                const Text(
+                  'This preference syncs to your account. Notification delivery is not configured for this app.',
+                  style: TextStyle(color: AppPalette.mutedInk, fontSize: 12),
+                ),
+                const SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
@@ -196,7 +242,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _message(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -210,7 +257,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: EmptyState(
                 icon: Icons.cloud_off_outlined,
                 title: 'Your notes could not load',
-                message: 'Check your connection and Supabase setup, then try again.',
+                message:
+                    'Check your connection and Supabase setup, then try again.',
                 actionLabel: 'Try again',
                 onAction: () => setState(() => _data = _load()),
               ),
@@ -218,7 +266,9 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
         if (!snapshot.hasData) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
         final data = snapshot.data!;
         return Scaffold(
@@ -229,21 +279,49 @@ class _HomeScreenState extends State<HomeScreen> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.page, 14, AppSpacing.page, 0),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.page,
+                      14,
+                      AppSpacing.page,
+                      0,
+                    ),
                     sliver: SliverToBoxAdapter(child: _header(data.profile)),
                   ),
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.page, 22, AppSpacing.page, 0),
-                    sliver: SliverToBoxAdapter(child: _streakCard(data.activity)),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.page, 24, AppSpacing.page, 0),
-                    sliver: SliverToBoxAdapter(child: _quickActions(data.profile)),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.page, 26, AppSpacing.page, 8),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.page,
+                      22,
+                      AppSpacing.page,
+                      0,
+                    ),
                     sliver: SliverToBoxAdapter(
-                      child: SectionHeading('Recent notes', action: 'See all', onAction: widget.onOpenNotes),
+                      child: _streakCard(data.activity),
+                    ),
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.page,
+                      24,
+                      AppSpacing.page,
+                      0,
+                    ),
+                    sliver: SliverToBoxAdapter(
+                      child: _quickActions(data.profile),
+                    ),
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.page,
+                      26,
+                      AppSpacing.page,
+                      8,
+                    ),
+                    sliver: SliverToBoxAdapter(
+                      child: SectionHeading(
+                        'Recent notes',
+                        action: 'See all',
+                        onAction: widget.onOpenNotes,
+                      ),
                     ),
                   ),
                   if (data.notes.isEmpty)
@@ -259,15 +337,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     )
                   else
                     SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(AppSpacing.page, 0, AppSpacing.page, 26),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.page,
+                        0,
+                        AppSpacing.page,
+                        26,
+                      ),
                       sliver: SliverList.separated(
                         itemCount: data.notes.length,
-                        separatorBuilder: (context, _) => const SizedBox(height: 10),
+                        separatorBuilder: (context, _) =>
+                            const SizedBox(height: 10),
                         itemBuilder: (context, index) {
                           final note = data.notes[index];
                           return NoteCard(
                             note: note,
-                            folderName: _folderName(data.folders, note.folderId),
+                            folderName: _folderName(
+                              data.folders,
+                              note.folderId,
+                            ),
                             onTap: () => widget.onOpenNote(note),
                             onEdit: () => widget.onOpenNote(note),
                             onDelete: () => _deleteNote(note),
@@ -292,13 +379,24 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('A little space for you', style: TextStyle(color: AppPalette.mutedInk)),
+              const Text(
+                'A little space for you',
+                style: TextStyle(color: AppPalette.mutedInk),
+              ),
               const SizedBox(height: 4),
-              Text('Hello, $firstName', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700)),
+              Text(
+                'Hello, $firstName',
+                style: Theme.of(context).textTheme.headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.w700),
+              ),
             ],
           ),
         ),
-        IconButton(tooltip: 'Search notes', onPressed: widget.onOpenNotes, icon: const Icon(Icons.search_rounded)),
+        IconButton(
+          tooltip: 'Search notes',
+          onPressed: widget.onOpenNotes,
+          icon: const Icon(Icons.search_rounded),
+        ),
         const SizedBox(width: 4),
         InkWell(
           onTap: widget.onOpenProfile,
@@ -306,7 +404,17 @@ class _HomeScreenState extends State<HomeScreen> {
           child: CircleAvatar(
             backgroundColor: AppPalette.lavender,
             foregroundColor: AppPalette.lavenderDeep,
-            child: Text(firstName.isEmpty ? 'M' : firstName[0].toUpperCase()),
+            backgroundImage:
+                profile.avatarUrl == null || profile.avatarUrl!.isEmpty
+                ? null
+                : NetworkImage(profile.avatarUrl!),
+            onBackgroundImageError:
+                profile.avatarUrl == null || profile.avatarUrl!.isEmpty
+                ? null
+                : (exception, stackTrace) {},
+            child: profile.avatarUrl == null || profile.avatarUrl!.isEmpty
+                ? Text(firstName.isEmpty ? 'M' : firstName[0].toUpperCase())
+                : null,
           ),
         ),
       ],
@@ -323,14 +431,25 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.local_fire_department_rounded, color: Color(0xFFE89863), size: 30),
+              const Icon(
+                Icons.local_fire_department_rounded,
+                color: Color(0xFFE89863),
+                size: 30,
+              ),
               const SizedBox(width: 9),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('${activity.currentStreak} day streak', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                    Text('${activity.activeDaysThisWeek} days written this week', style: const TextStyle(color: AppPalette.mutedInk)),
+                    Text(
+                      '${activity.currentStreak} day streak',
+                      style: Theme.of(context).textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    Text(
+                      '${activity.activeDaysThisWeek} days written this week',
+                      style: const TextStyle(color: AppPalette.mutedInk),
+                    ),
                   ],
                 ),
               ),
@@ -344,12 +463,24 @@ class _HomeScreenState extends State<HomeScreen> {
               final active = activity.thisWeek[index];
               return Column(
                 children: [
-                  Text(weekdayLabels[index], style: const TextStyle(fontSize: 11, color: AppPalette.mutedInk)),
+                  Text(
+                    weekdayLabels[index],
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppPalette.mutedInk,
+                    ),
+                  ),
                   const SizedBox(height: 6),
                   CircleAvatar(
                     radius: 12,
-                    backgroundColor: active ? AppPalette.lavenderDeep : Colors.white.withValues(alpha: .75),
-                    child: Icon(active ? Icons.check_rounded : Icons.circle_outlined, size: 13, color: active ? Colors.white : AppPalette.mutedInk),
+                    backgroundColor: active
+                        ? AppPalette.lavenderDeep
+                        : Colors.white.withValues(alpha: .75),
+                    child: Icon(
+                      active ? Icons.check_rounded : Icons.circle_outlined,
+                      size: 13,
+                      color: active ? Colors.white : AppPalette.mutedInk,
+                    ),
                   ),
                 ],
               );
@@ -370,10 +501,30 @@ class _HomeScreenState extends State<HomeScreen> {
           spacing: 10,
           runSpacing: 10,
           children: [
-            _QuickAction(icon: Icons.add_rounded, label: 'New note', color: AppPalette.pink, onTap: widget.onCreateNote),
-            _QuickAction(icon: Icons.notifications_none_rounded, label: 'Reminders', color: AppPalette.yellow, onTap: () => _showReminderSettings(profile)),
-            _QuickAction(icon: Icons.folder_open_rounded, label: 'Folders', color: AppPalette.mint, onTap: widget.onOpenFolders),
-            _QuickAction(icon: Icons.auto_awesome_outlined, label: 'Templates', color: AppPalette.peach, onTap: _showTemplates),
+            _QuickAction(
+              icon: Icons.add_rounded,
+              label: 'New note',
+              color: AppPalette.pink,
+              onTap: widget.onCreateNote,
+            ),
+            _QuickAction(
+              icon: Icons.notifications_none_rounded,
+              label: 'Reminders',
+              color: AppPalette.yellow,
+              onTap: () => _showReminderSettings(profile),
+            ),
+            _QuickAction(
+              icon: Icons.folder_open_rounded,
+              label: 'Folders',
+              color: AppPalette.mint,
+              onTap: widget.onOpenFolders,
+            ),
+            _QuickAction(
+              icon: Icons.auto_awesome_outlined,
+              label: 'Templates',
+              color: AppPalette.peach,
+              onTap: _showTemplates,
+            ),
           ],
         ),
       ],
@@ -389,7 +540,12 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _QuickAction extends StatelessWidget {
-  const _QuickAction({required this.icon, required this.label, required this.color, required this.onTap});
+  const _QuickAction({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
 
   final IconData icon;
   final String label;

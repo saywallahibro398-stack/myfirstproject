@@ -43,9 +43,8 @@ class NoteCard extends StatelessWidget {
                       note.displayTitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                      style: Theme.of(context).textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700),
                     ),
                   ),
                   if (onEdit != null || onDelete != null)
@@ -57,11 +56,20 @@ class NoteCard extends StatelessWidget {
                       },
                       itemBuilder: (context) => [
                         if (onEdit != null)
-                          const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                          const PopupMenuItem(
+                            value: 'edit',
+                            child: Text('Edit'),
+                          ),
                         if (onDelete != null)
-                          const PopupMenuItem(value: 'delete', child: Text('Delete')),
+                          const PopupMenuItem(
+                            value: 'delete',
+                            child: Text('Delete'),
+                          ),
                       ],
-                      icon: const Icon(Icons.more_horiz, color: AppPalette.mutedInk),
+                      icon: const Icon(
+                        Icons.more_horiz,
+                        color: AppPalette.mutedInk,
+                      ),
                     ),
                 ],
               ),
@@ -70,24 +78,29 @@ class NoteCard extends StatelessWidget {
                   note.preview,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppPalette.mutedInk,
-                        height: 1.4,
-                      ),
+                  style: Theme.of(context).textTheme.bodyMedium
+                      ?.copyWith(color: AppPalette.mutedInk, height: 1.4),
                 ),
                 const SizedBox(height: 12),
               ],
               Row(
                 children: [
                   if (folderName != null) ...[
-                    const Icon(Icons.folder_outlined, size: 14, color: AppPalette.lavenderDeep),
+                    const Icon(
+                      Icons.folder_outlined,
+                      size: 14,
+                      color: AppPalette.lavenderDeep,
+                    ),
                     const SizedBox(width: 4),
                     Flexible(
                       child: Text(
                         folderName!,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 12, color: AppPalette.mutedInk),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppPalette.mutedInk,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -95,7 +108,10 @@ class NoteCard extends StatelessWidget {
                   const Spacer(),
                   Text(
                     _dateLabel(note.updatedAt),
-                    style: const TextStyle(fontSize: 12, color: AppPalette.mutedInk),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppPalette.mutedInk,
+                    ),
                   ),
                 ],
               ),
@@ -104,7 +120,10 @@ class NoteCard extends StatelessWidget {
                 Wrap(
                   spacing: 6,
                   runSpacing: 4,
-                  children: note.tags.take(3).map((tag) => _Tag(label: tag)).toList(),
+                  children: note.tags
+                      .take(3)
+                      .map((tag) => _Tag(label: tag))
+                      .toList(),
                 ),
               ],
             ],
@@ -117,7 +136,9 @@ class NoteCard extends StatelessWidget {
   String _dateLabel(DateTime date) {
     final now = DateTime.now();
     final local = date.toLocal();
-    if (local.year == now.year && local.month == now.month && local.day == now.day) {
+    if (local.year == now.year &&
+        local.month == now.month &&
+        local.day == now.day) {
       return '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
     }
     return '${local.month}/${local.day}';
@@ -131,11 +152,14 @@ class _Tag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: .62),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(label, style: const TextStyle(fontSize: 11, color: AppPalette.ink)),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(
+      color: Colors.white.withValues(alpha: .62),
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Text(
+      label,
+      style: const TextStyle(fontSize: 11, color: AppPalette.ink),
+    ),
+  );
 }

@@ -130,10 +130,14 @@ set search_path = ''
 as $$
 begin
   if tg_op = 'UPDATE' then
+    new.created_at := old.created_at;
     new.updated_at := now();
     if new.user_id <> old.user_id then
       raise exception 'A note cannot be transferred to another account';
     end if;
+  else
+    new.created_at := now();
+    new.updated_at := now();
   end if;
 
   if new.folder_id is not null and not exists (
@@ -213,11 +217,10 @@ for each row execute function public.record_note_activity();
 
 create or replace function public.get_leaderboard(p_period text, p_limit integer default 100)
 returns table (
-  user_id uuid,
   display_name text,
   avatar_url text,
   score bigint,
-  position integer,
+  rank_position integer,
   is_current_user boolean
 )
 language plpgsql
@@ -275,7 +278,6 @@ begin
     where p.leaderboard_public
   )
   select
-    r.user_id,
     r.display_name,
     r.avatar_url,
     r.total_points,
@@ -333,14 +335,16 @@ create policy "Users read their own writing activity"
   on public.writing_activity for select to authenticated
   using (user_id = (select auth.uid()));
 
-revoke all on public.ranking_events from anon, authenticated;
-revoke insert, update, delete on public.writing_activity from anon, authenticated;
+revoke all on public.profiles from anon, authenticated;
+revoke all on public.folders, public.notes from anon, authenticated;
+revoke all on public.writing_activity, public.ranking_events from anon, authenticated;
 revoke all on function public.create_my_notes_profile() from public, anon, authenticated;
 revoke all on function public.prepare_note_write() from public, anon, authenticated;
 revoke all on function public.record_note_activity() from public, anon, authenticated;
 revoke all on function public.get_leaderboard(text, integer) from public, anon;
 grant execute on function public.get_leaderboard(text, integer) to authenticated;
 
- grant select, insert, update, delete on public.folders, public.notes to authenticated;
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on public.folders, public.notes to authenticated;
 grant select, update on public.profiles to authenticated;
 grant select on public.writing_activity to authenticated;

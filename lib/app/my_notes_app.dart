@@ -6,11 +6,7 @@ import '../features/auth/welcome_screen.dart';
 import 'session_gate.dart';
 
 class MyNotesApp extends StatefulWidget {
-  const MyNotesApp({
-    required this.client,
-    this.initializationError,
-    super.key,
-  });
+  const MyNotesApp({required this.client, this.initializationError, super.key});
 
   final SupabaseClient? client;
   final String? initializationError;
@@ -39,10 +35,7 @@ class _MyNotesAppState extends State<MyNotesApp> {
               client: null,
               initializationError: widget.initializationError,
             )
-          : SessionGate(
-              client: widget.client!,
-              onThemeChanged: _setDarkMode,
-            ),
+          : SessionGate(client: widget.client!, onThemeChanged: _setDarkMode),
     );
   }
 }

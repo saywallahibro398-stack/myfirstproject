@@ -27,7 +27,9 @@ class ProfileRepository {
         .from('profiles')
         .update({
           'display_name': displayName.trim(),
-          'avatar_url': avatarUrl?.trim().isEmpty == true ? null : avatarUrl?.trim(),
+          'avatar_url': avatarUrl?.trim().isEmpty == true
+              ? null
+              : avatarUrl?.trim(),
           'leaderboard_public': leaderboardPublic,
           'preferences': preferences,
           'updated_at': DateTime.now().toUtc().toIso8601String(),

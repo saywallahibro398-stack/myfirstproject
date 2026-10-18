@@ -42,13 +42,20 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.note?.title ?? widget.initialTitle ?? '');
-    _contentController = TextEditingController(text: widget.note?.content ?? widget.initialContent ?? '');
-    _tagsController = TextEditingController(text: widget.note?.tags.join(', ') ?? '');
+    _titleController = TextEditingController(
+      text: widget.note?.title ?? widget.initialTitle ?? '',
+    );
+    _contentController = TextEditingController(
+      text: widget.note?.content ?? widget.initialContent ?? '',
+    );
+    _tagsController = TextEditingController(
+      text: widget.note?.tags.join(', ') ?? '',
+    );
     _titleController.addListener(_markDirty);
     _contentController.addListener(_markDirty);
     _tagsController.addListener(_markDirty);
-    _color = widget.note?.color ?? AppPalette.toHex(AppPalette.noteColors.first);
+    _color =
+        widget.note?.color ?? AppPalette.toHex(AppPalette.noteColors.first);
     _folderId = widget.note?.folderId ?? widget.initialFolderId;
     _folders = NotesRepository(widget.client).fetchFolders();
   }
@@ -66,7 +73,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   }
 
   Future<void> _save() async {
-    if (_titleController.text.trim().isEmpty && _contentController.text.trim().isEmpty) {
+    if (_titleController.text.trim().isEmpty &&
+        _contentController.text.trim().isEmpty) {
       _message('Add a title or a few words before saving.');
       return;
     }
@@ -90,7 +98,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     } on PostgrestException catch (error) {
       _message(error.message);
     } catch (_) {
-      _message('Your note could not be saved. Check your connection and try again.');
+      _message(
+        'Your note could not be saved. Check your connection and try again.',
+      );
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -101,10 +111,18 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete this note?'),
-        content: const Text('This note will be permanently removed from your account.'),
+        content: const Text(
+          'This note will be permanently removed from your account.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Keep note')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Keep note'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
         ],
       ),
     );
@@ -129,8 +147,14 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         title: const Text('Leave without saving?'),
         content: const Text('Your latest changes will be discarded.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Keep editing')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Discard changes')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Keep editing'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Discard changes'),
+          ),
         ],
       ),
     );
@@ -150,7 +174,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     final replacement = '$before$opening$selected$closing$after';
     _contentController.value = TextEditingValue(
       text: replacement,
-      selection: TextSelection.collapsed(offset: start + opening.length + selected.length + closing.length),
+      selection: TextSelection.collapsed(
+        offset: start + opening.length + selected.length + closing.length,
+      ),
     );
   }
 
@@ -185,7 +211,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               child: FilledButton.icon(
                 onPressed: _saving ? null : _save,
                 icon: _saving
-                    ? const SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    ? const SizedBox.square(
+                        dimension: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
                     : const Icon(Icons.check_rounded),
                 label: const Text('Save'),
               ),
@@ -203,7 +235,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   TextField(
                     controller: _titleController,
                     textCapitalization: TextCapitalization.sentences,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700),
+                    style: Theme.of(context).textTheme.headlineMedium
+                        ?.copyWith(fontWeight: FontWeight.w700),
                     decoration: const InputDecoration(
                       hintText: 'Give this thought a title',
                       filled: false,
@@ -216,7 +249,10 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   if (widget.note != null) ...[
                     Text(
                       'Created ${_formatDate(widget.note!.createdAt)}  ·  Edited ${_formatDate(widget.note!.updatedAt)}',
-                      style: const TextStyle(fontSize: 12, color: AppPalette.mutedInk),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppPalette.mutedInk,
+                      ),
                     ),
                     const SizedBox(height: 14),
                   ],
@@ -224,12 +260,39 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        _FormatButton(icon: Icons.format_bold, tooltip: 'Bold', onPressed: () => _format('**')),
-                        _FormatButton(icon: Icons.format_italic, tooltip: 'Italic', onPressed: () => _format('*')),
-                        _FormatButton(icon: Icons.format_underline, tooltip: 'Underline', onPressed: () => _format('__')),
-                        _FormatButton(icon: Icons.title, tooltip: 'Heading', onPressed: () => _format('', prefix: '## ', suffix: '')),
-                        _FormatButton(icon: Icons.format_list_bulleted, tooltip: 'Bullet list', onPressed: () => _format('', prefix: '- ', suffix: '')),
-                        _FormatButton(icon: Icons.format_list_numbered, tooltip: 'Numbered list', onPressed: () => _format('', prefix: '1. ', suffix: '')),
+                        _FormatButton(
+                          icon: Icons.format_bold,
+                          tooltip: 'Bold',
+                          onPressed: () => _format('**'),
+                        ),
+                        _FormatButton(
+                          icon: Icons.format_italic,
+                          tooltip: 'Italic',
+                          onPressed: () => _format('*'),
+                        ),
+                        _FormatButton(
+                          icon: Icons.format_underline,
+                          tooltip: 'Underline',
+                          onPressed: () => _format('__'),
+                        ),
+                        _FormatButton(
+                          icon: Icons.title,
+                          tooltip: 'Heading',
+                          onPressed: () =>
+                              _format('', prefix: '## ', suffix: ''),
+                        ),
+                        _FormatButton(
+                          icon: Icons.format_list_bulleted,
+                          tooltip: 'Bullet list',
+                          onPressed: () =>
+                              _format('', prefix: '- ', suffix: ''),
+                        ),
+                        _FormatButton(
+                          icon: Icons.format_list_numbered,
+                          tooltip: 'Numbered list',
+                          onPressed: () =>
+                              _format('', prefix: '1. ', suffix: ''),
+                        ),
                       ],
                     ),
                   ),
@@ -252,32 +315,57 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Note color', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                        Text(
+                          'Note color',
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
                         const SizedBox(height: 12),
                         Wrap(
                           spacing: 12,
                           children: AppPalette.noteColors.map((color) {
                             final hex = AppPalette.toHex(color);
                             return InkWell(
-                              onTap: () => setState(() { _color = hex; _dirty = true; }),
+                              onTap: () => setState(() {
+                                _color = hex;
+                                _dirty = true;
+                              }),
                               borderRadius: BorderRadius.circular(24),
                               child: CircleAvatar(
                                 radius: 17,
                                 backgroundColor: color,
-                                child: _color == hex ? const Icon(Icons.check, size: 17) : null,
+                                child: _color == hex
+                                    ? const Icon(Icons.check, size: 17)
+                                    : null,
                               ),
                             );
                           }).toList(),
                         ),
                         const SizedBox(height: 18),
                         DropdownButtonFormField<String?>(
-                          initialValue: folders.any((folder) => folder.id == _folderId) ? _folderId : null,
-                          decoration: const InputDecoration(labelText: 'Folder'),
+                          initialValue:
+                              folders.any((folder) => folder.id == _folderId)
+                              ? _folderId
+                              : null,
+                          decoration: const InputDecoration(
+                            labelText: 'Folder',
+                          ),
                           items: [
-                            const DropdownMenuItem<String?>(value: null, child: Text('No folder')),
-                            ...folders.map((folder) => DropdownMenuItem<String?>(value: folder.id, child: Text(folder.name))),
+                            const DropdownMenuItem<String?>(
+                              value: null,
+                              child: Text('No folder'),
+                            ),
+                            ...folders.map(
+                              (folder) => DropdownMenuItem<String?>(
+                                value: folder.id,
+                                child: Text(folder.name),
+                              ),
+                            ),
                           ],
-                          onChanged: (value) => setState(() { _folderId = value; _dirty = true; }),
+                          onChanged: (value) => setState(() {
+                            _folderId = value;
+                            _dirty = true;
+                          }),
                         ),
                         const SizedBox(height: 14),
                         TextField(
@@ -293,9 +381,14 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    widget.note == null ? 'Your note syncs to your private Supabase account when saved.' : 'Changes sync to your account when you save.',
+                    widget.note == null
+                        ? 'Your note syncs to your private Supabase account when saved.'
+                        : 'Changes sync to your account when you save.',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: AppPalette.mutedInk, fontSize: 12),
+                    style: const TextStyle(
+                      color: AppPalette.mutedInk,
+                      fontSize: 12,
+                    ),
                   ),
                 ],
               );
@@ -313,7 +406,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 }
 
 class _FormatButton extends StatelessWidget {
-  const _FormatButton({required this.icon, required this.tooltip, required this.onPressed});
+  const _FormatButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+  });
 
   final IconData icon;
   final String tooltip;
@@ -321,9 +418,11 @@ class _FormatButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => IconButton(
-        onPressed: onPressed,
-        tooltip: tooltip,
-        icon: Icon(icon, size: 19),
-        style: IconButton.styleFrom(backgroundColor: AppPalette.lavender.withValues(alpha: .6)),
-      );
+    onPressed: onPressed,
+    tooltip: tooltip,
+    icon: Icon(icon, size: 19),
+    style: IconButton.styleFrom(
+      backgroundColor: AppPalette.lavender.withValues(alpha: .6),
+    ),
+  );
 }
