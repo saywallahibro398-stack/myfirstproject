@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/services.dart';
 
 import 'package:myfirstproject/core/app_config.dart';
 import 'package:myfirstproject/core/supabase_startup.dart';
@@ -31,6 +32,25 @@ void main() {
       config.configurationError,
       'SUPABASE_URL must be a valid HTTP or HTTPS project URL.',
     );
+  });
+
+  test('shows safe PlatformException details without leaking build values', () {
+    const config = AppConfig(
+      supabaseUrl: 'https://private-project.example',
+      supabaseKey: 'synthetic-public-key',
+    );
+    final error = PlatformException(
+      code: 'channel-error',
+      message: 'Failed for ${config.supabaseUrl} with ${config.supabaseKey}',
+    );
+
+    final diagnostic = describeSupabaseStartupError(config, error);
+
+    expect(diagnostic, contains('PlatformException code=channel-error'));
+    expect(diagnostic, contains('[SUPABASE_URL]'));
+    expect(diagnostic, contains('[SUPABASE_PUBLIC_KEY]'));
+    expect(diagnostic, isNot(contains(config.supabaseUrl)));
+    expect(diagnostic, isNot(contains(config.supabaseKey)));
   });
 
   final buildConfig = AppConfig.fromBuildEnvironment;

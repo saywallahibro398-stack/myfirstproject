@@ -59,6 +59,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+dependency_overrides:
+  # Keep Supabase session storage on the Flutter platform-channel bridge; 2.5.0 switches to JNI.
+  shared_preferences_android: 2.4.28
 
   # To add assets to your application, add an assets section, like this:
   # assets:

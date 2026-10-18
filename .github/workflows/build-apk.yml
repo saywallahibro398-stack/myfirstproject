@@ -32,6 +32,15 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Verify Android preferences bridge version
+        run: |
+          version="$(flutter pub deps --style=compact | awk '$2 == "shared_preferences_android" { print $3; exit }')"
+          if [ "$version" != "2.4.28" ]; then
+            echo "::error::Expected shared_preferences_android 2.4.28, got ${version:-missing}"
+            exit 1
+          fi
+          echo "Using shared_preferences_android $version"
+
       - name: Check Dart formatting
         run: dart format --output=none --set-exit-if-changed lib test
 
