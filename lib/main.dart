@@ -20,8 +20,9 @@ Future<void> main() async {
         ),
       );
       client = Supabase.instance.client;
-    } catch (_) {
-      initializationError = 'Supabase initialization failed. Check that the project URL and public key are valid and belong to the same project.';
+    } catch (error) {
+      initializationError =
+          'Supabase initialization failed (${error.runtimeType}). The build values are present; check Android storage setup and Supabase SDK configuration.';
     }
   }
 

@@ -64,6 +64,27 @@ jobs:
           fi
           echo "Both Supabase secrets are present."
 
+      - name: Verify Supabase URL and publishable key belong together
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          set +x
+          endpoint="${SUPABASE_URL%/}/auth/v1/settings"
+          if ! status=$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            --connect-timeout 10 --max-time 20 \
+            -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" \
+            "$endpoint"); then
+            echo "::error::Could not reach the configured Supabase Auth endpoint."
+            exit 1
+          fi
+          if [ "$status" != "200" ]; then
+            echo "::error::Supabase rejected the configured URL/key pair (HTTP $status). No credentials were logged."
+            exit 1
+          fi
+          echo "Supabase Auth accepted the configured URL/key pair."
+
       - name: Build release APK
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

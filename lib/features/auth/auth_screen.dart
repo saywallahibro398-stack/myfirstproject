@@ -263,7 +263,9 @@ class _AuthScreenState extends State<AuthScreen> {
                           Align(
                             alignment: Alignment.centerRight,
                             child: TextButton(
-                              onPressed: _loading ? null : _forgotPassword,
+                              onPressed: _loading || widget.client == null
+                                  ? null
+                                  : _forgotPassword,
                               child: const Text('Forgot password?'),
                             ),
                           )
@@ -272,7 +274,9 @@ class _AuthScreenState extends State<AuthScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: FilledButton(
-                            onPressed: _loading ? null : _submit,
+                            onPressed: _loading || widget.client == null
+                                ? null
+                                : _submit,
                             child: _loading
                                 ? const SizedBox.square(
                                     dimension: 20,
@@ -304,7 +308,9 @@ class _AuthScreenState extends State<AuthScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: OutlinedButton.icon(
-                            onPressed: _loading ? null : _continueWithGoogle,
+                            onPressed: _loading || widget.client == null
+                                ? null
+                                : _continueWithGoogle,
                             icon: const Icon(Icons.g_mobiledata, size: 25),
                             label: const Text('Continue with Google'),
                           ),
