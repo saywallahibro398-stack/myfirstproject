@@ -1,8 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:myfirstproject/core/app_config.dart';
+import 'package:myfirstproject/core/supabase_startup.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -44,15 +44,8 @@ void main() {
     'Supabase Flutter SDK initializes with the compiled project configuration',
     () async {
       SharedPreferences.setMockInitialValues({});
-      await Supabase.initialize(
-        url: buildConfig.supabaseUrl.trim(),
-        publishableKey: buildConfig.supabaseKey.trim(),
-        authOptions: const FlutterAuthClientOptions(
-          authFlowType: AuthFlowType.pkce,
-        ),
-      );
-
-      expect(Supabase.instance.isInitialized, isTrue);
+      final startup = await initializeSupabase(buildConfig);
+      expect(startup.client, isNotNull, reason: startup.error);
     },
     skip: buildConfig.isConfigured ? false : 'Run this check with the Supabase build defines (the CI workflow does).',
   );
