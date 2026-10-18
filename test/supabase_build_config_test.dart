@@ -1,8 +1,12 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:myfirstproject/core/app_config.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   test('reports a missing URL separately from a missing client key', () {
     expect(
       const AppConfig(supabaseUrl: '', supabaseKey: '').configurationError,
@@ -33,6 +37,23 @@ void main() {
   test(
     'Flutter compiled the Supabase URL and public key into this build',
     () => expect(buildConfig.configurationError, isNull),
+    skip: buildConfig.isConfigured ? false : 'Run this check with the Supabase build defines (the CI workflow does).',
+  );
+
+  test(
+    'Supabase Flutter SDK initializes with the compiled project configuration',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      await Supabase.initialize(
+        url: buildConfig.supabaseUrl.trim(),
+        publishableKey: buildConfig.supabaseKey.trim(),
+        authOptions: const FlutterAuthClientOptions(
+          authFlowType: AuthFlowType.pkce,
+        ),
+      );
+
+      expect(Supabase.instance.isInitialized, isTrue);
+    },
     skip: buildConfig.isConfigured ? false : 'Run this check with the Supabase build defines (the CI workflow does).',
   );
 }
