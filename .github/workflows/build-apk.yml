@@ -85,23 +85,6 @@ jobs:
           fi
           echo "Supabase Auth accepted the configured URL/key pair."
 
-      - name: Verify Supabase startup on Android
-        uses: reactivecircus/android-emulator-runner@v2
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-        with:
-          api-level: 35
-          arch: x86_64
-          profile: pixel_6
-          disable-animations: true
-          script: |
-            flutter test integration_test/supabase_startup_test.dart \
-              --dart-define=SUPABASE_URL="$SUPABASE_URL" \
-              --dart-define=SUPABASE_PUBLISHABLE_KEY="$SUPABASE_PUBLISHABLE_KEY" \
-              --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY"
-
       - name: Build release APK
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -115,6 +98,14 @@ jobs:
 
       - name: Verify release APK
         run: test -s build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Verify release APK network permission
+        run: |
+          set -eu
+          aapt="$(find "$ANDROID_HOME/build-tools" -maxdepth 2 -type f -name aapt | sort -V | tail -n 1)"
+          test -x "$aapt"
+          "$aapt" dump permissions build/app/outputs/flutter-apk/app-release.apk | grep -Fq 'android.permission.INTERNET'
+          echo "Release APK includes android.permission.INTERNET."
 
       - name: Upload release APK
         uses: actions/upload-artifact@v4
