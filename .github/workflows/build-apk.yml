@@ -33,10 +33,21 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Print Android SHA-1 fingerprints
+      
+      - name: Generate debug keystore and print SHA-1
         run: |
+          mkdir -p "$HOME/.config/.android"
+          keytool -genkeypair \
+            -keystore "$HOME/.config/.android/debug.keystore" \
+            -storepass android \
+            -keypass android \
+            -alias AndroidDebugKey \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+
           cd android
-          chmod +x gradlew
           ./gradlew signingReport
 
       - name: Verify Android preferences bridge version
