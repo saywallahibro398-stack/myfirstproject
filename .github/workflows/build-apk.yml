@@ -1,3 +1,4 @@
+
 name: Build Android APK
 
 on:
@@ -31,6 +32,12 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Print Android SHA-1 fingerprints
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew signingReport
 
       - name: Verify Android preferences bridge version
         run: |
