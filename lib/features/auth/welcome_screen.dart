@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/app_config.dart';
 import '../../core/app_theme.dart';
 import 'auth_screen.dart';
 
@@ -19,7 +20,13 @@ class WelcomeScreen extends StatelessWidget {
   void _openAuth(BuildContext context, {required bool signUp}) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => AuthScreen(client: client, startWithSignUp: signUp),
+        builder: (_) => AuthScreen(
+          client: client,
+          startWithSignUp: signUp,
+          setupError:
+              initializationError ??
+              AppConfig.fromBuildEnvironment.configurationError,
+        ),
       ),
     );
   }
@@ -87,8 +94,12 @@ class WelcomeScreen extends StatelessWidget {
                             color: AppPalette.yellow,
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: const Text(
-                            'Connect a Supabase project to create an account and sync notes. Add SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY at build time.',
+                          child: Text(
+                            initializationError ??
+                                AppConfig
+                                    .fromBuildEnvironment
+                                    .configurationError ??
+                                'Supabase could not initialize. Check the project URL and public key.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: AppPalette.ink,

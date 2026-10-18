@@ -12,9 +12,23 @@ class AppConfig {
   final String supabaseUrl;
   final String supabaseKey;
 
-  bool get isConfigured =>
-      Uri.tryParse(supabaseUrl)?.hasAuthority == true &&
-      supabaseKey.trim().isNotEmpty;
+  String? get configurationError {
+    if (supabaseUrl.trim().isEmpty) {
+      return 'The build is missing SUPABASE_URL.';
+    }
+    if (supabaseKey.trim().isEmpty) {
+      return 'The build is missing SUPABASE_PUBLISHABLE_KEY (or SUPABASE_ANON_KEY).';
+    }
+    final uri = Uri.tryParse(supabaseUrl.trim());
+    if (uri == null ||
+        !uri.hasAuthority ||
+        !{'https', 'http'}.contains(uri.scheme)) {
+      return 'SUPABASE_URL must be a valid HTTP or HTTPS project URL.';
+    }
+    return null;
+  }
+
+  bool get isConfigured => configurationError == null;
 
   String get authRedirectUrl => 'my-notes://login-callback/';
 }

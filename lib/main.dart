@@ -8,20 +8,20 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final config = AppConfig.fromBuildEnvironment;
   SupabaseClient? client;
-  String? initializationError;
+  String? initializationError = config.configurationError;
 
-  if (config.isConfigured) {
+  if (initializationError == null) {
     try {
       await Supabase.initialize(
-        url: config.supabaseUrl,
-        publishableKey: config.supabaseKey,
+        url: config.supabaseUrl.trim(),
+        publishableKey: config.supabaseKey.trim(),
         authOptions: const FlutterAuthClientOptions(
           authFlowType: AuthFlowType.pkce,
         ),
       );
       client = Supabase.instance.client;
     } catch (_) {
-      initializationError = 'Check the Supabase URL and public client key.';
+      initializationError = 'Supabase initialization failed. Check that the project URL and public key are valid and belong to the same project.';
     }
   }
 

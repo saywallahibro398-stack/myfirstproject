@@ -9,11 +9,13 @@ class AuthScreen extends StatefulWidget {
   const AuthScreen({
     required this.client,
     required this.startWithSignUp,
+    this.setupError,
     super.key,
   });
 
   final SupabaseClient? client;
   final bool startWithSignUp;
+  final String? setupError;
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -40,9 +42,7 @@ class _AuthScreenState extends State<AuthScreen> {
     if (!_formKey.currentState!.validate()) return;
     final client = widget.client;
     if (client == null) {
-      _message(
-        'Add the Supabase URL and publishable key to connect your account.',
-      );
+      _message(_setupErrorMessage);
       return;
     }
 
@@ -80,7 +80,7 @@ class _AuthScreenState extends State<AuthScreen> {
   Future<void> _continueWithGoogle() async {
     final client = widget.client;
     if (client == null) {
-      _message('Connect Supabase before signing in.');
+      _message(_setupErrorMessage);
       return;
     }
     setState(() => _loading = true);
@@ -325,10 +325,10 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 ),
                 if (widget.client == null)
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(top: 8),
                     child: Text(
-                      'Authentication requires SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY at build time.',
+                      _setupErrorMessage,
                       textAlign: TextAlign.center,
                       style: TextStyle(color: AppPalette.mutedInk),
                     ),
@@ -340,4 +340,9 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
     );
   }
+
+  String get _setupErrorMessage =>
+      widget.setupError ??
+      AppConfig.fromBuildEnvironment.configurationError ??
+      'Supabase could not initialize. Check the project URL and public key.';
 }
