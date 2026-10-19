@@ -61,11 +61,23 @@ class _AuthScreenState extends State<AuthScreen> {
           );
         }
       } else {
-        await client.auth.signInWithPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
-      }
+  final response = await client.auth.signInWithPassword(
+    email: _emailController.text.trim(),
+    password: _passwordController.text,
+  );
+
+  if (response.session == null || response.user == null) {
+    _message(
+      'Login did not create a session. Check your details and try again.',
+    );
+    return;
+  }
+
+  // Login succeeded. Reveal the authenticated app.
+  if (mounted) {
+    Navigator.of(context).popUntil((route) => route.isFirst);
+  }
+}
     } on AuthException catch (error) {
       _message(error.message);
     } catch (_) {
