@@ -30,5 +30,5 @@ class AppConfig {
 
   bool get isConfigured => configurationError == null;
 
-  String get authRedirectUrl => 'my-notes://login-callback/';
+  String get authRedirectUrl => 'my-notes://login-callback';
 }
